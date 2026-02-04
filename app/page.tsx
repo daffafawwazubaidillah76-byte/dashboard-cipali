@@ -9,7 +9,6 @@ export default function DashboardCipali() {
   const [history, setHistory] = useState<{ [key: string]: any[] }>({});
   const [loading, setLoading] = useState(true);
 
-  // 1. DEFINISIKAN URUTAN GERBANG TOL
   const urutanGerbang = [
     "GT_CIKOPO", 
     "GT_KALIJATI", 
@@ -35,7 +34,6 @@ export default function DashboardCipali() {
           })
         }));
 
-        // 2. PROSES PENGURUTAN (SORTING)
         formattedData.sort((a, b) => {
           return urutanGerbang.indexOf(a.gate) - urutanGerbang.indexOf(b.gate);
         });
@@ -74,113 +72,123 @@ export default function DashboardCipali() {
   };
 
   return (
-    <main className="min-h-screen bg-white text-gray-900 p-4 md:p-8 font-sans">
-      <h1 className="text-3xl font-bold text-center text-orange-500 mb-12 uppercase tracking-widest">
-        Monitoring Ruang Server Cipali
-      </h1>
-
-      {loading ? (
-        <div className="flex flex-col items-center justify-center py-40">
-          <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-gray-500">Menyusun Data Gerbang Tol...</p>
+    <main className="min-h-screen bg-white text-gray-900 font-sans">
+      {/* --- AREA HEADER DENGAN BACKGROUND ABU-ABU MUDA --- */}
+      <header className="bg-gray-50 border-b border-gray-200 py-10 mb-12 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4">
+          <h1 className="text-3xl md:text-4xl font-black text-center text-orange-500 uppercase tracking-[0.2em] drop-shadow-sm">
+            Monitoring Ruang Server Cipali
+          </h1>
+          <p className="text-center text-gray-400 text-[10px] mt-2 tracking-widest uppercase">
+            Sistem Pemantauan Suhu & Kelembapan Real-Time
+          </p>
         </div>
-      ) : (
-        <>
-          <div className="space-y-12 mb-16">
-            {data.map((item, i) => (
-              <div key={i} className="bg-gray-50 border border-gray-200 p-6 rounded-3xl shadow-sm">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-gray-200 pb-4">
-                  <div>
-                    <h2 className="text-2xl font-black text-orange-600">{item.gate}</h2>
-                    <p className="text-gray-500 text-[10px] mt-1 uppercase tracking-wider">
-                        📅 {item.tanggalDisplay} | 🕒 {item.waktuDisplay}
-                    </p>
-                  </div>
-                  <div className="flex gap-8 mt-4 md:mt-0">
-                    <div className="text-right">
-                      <p className="text-gray-400 text-[10px]">AVG SUHU</p>
-                      <p className="text-lg font-bold text-orange-400">{getAverage(item.gate, 'suhu')}°C</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-gray-400 text-[10px]">AVG LEMBAP</p>
-                      <p className="text-lg font-bold text-cyan-600">{getAverage(item.gate, 'kelembapan')}%</p>
-                    </div>
-                  </div>
-                </div>
+      </header>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  <div className="space-y-4">
-                    <div className="bg-white p-5 rounded-2xl border border-gray-200 flex justify-between items-center shadow-sm">
-                      <span className="text-gray-400 text-xs">SUHU SAAT INI</span>
-                      <span className={`text-3xl font-black ${item.suhu > 27 ? 'text-red-500' : 'text-gray-900'}`}>
-                        {item.suhu}°C
-                      </span>
-                    </div>
-                    <div className="bg-white p-5 rounded-2xl border border-gray-200 flex justify-between items-center shadow-sm">
-                      <span className="text-gray-400 text-xs">LEMBAP SAAT INI</span>
-                      <span className="text-3xl font-black text-blue-500">{item.kelembapan}%</span>
-                    </div>
-                  </div>
-
-                  <div className="lg:col-span-2 bg-white p-4 rounded-2xl border border-gray-200 h-[280px] shadow-sm">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={history[item.gate] || []}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#eee" vertical={false} />
-                        <XAxis dataKey="waktuDisplay" stroke="#999" fontSize={10} />
-                        <YAxis stroke="#999" fontSize={10} domain={['auto', 'auto']} />
-                        <Tooltip contentStyle={{backgroundColor:'#fff', border:'1px solid #ddd', borderRadius: '8px'}} />
-                        <Legend />
-                        <Line name="Suhu (°C)" type="monotone" dataKey="suhu" stroke="#f97316" strokeWidth={3} dot={false} isAnimationActive={false} />
-                        <Line name="Lembap (%)" type="monotone" dataKey="kelembapan" stroke="#06b6d4" strokeWidth={3} dot={false} isAnimationActive={false} />
-                      </LineChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-              </div>
-            ))}
+      <div className="max-w-7xl mx-auto px-4 md:px-8">
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-40">
+            <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p className="text-gray-500">Menyusun Data Gerbang Tol...</p>
           </div>
+        ) : (
+          <>
+            <div className="space-y-12 mb-16">
+              {data.map((item, i) => (
+                <div key={i} className="bg-gray-50 border border-gray-200 p-6 rounded-3xl shadow-sm">
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-gray-200 pb-4">
+                    <div>
+                      <h2 className="text-2xl font-black text-orange-600">{item.gate}</h2>
+                      <p className="text-gray-500 text-[10px] mt-1 uppercase tracking-wider">
+                          📅 {item.tanggalDisplay} | 🕒 {item.waktuDisplay}
+                      </p>
+                    </div>
+                    <div className="flex gap-8 mt-4 md:mt-0">
+                      <div className="text-right">
+                        <p className="text-gray-400 text-[10px]">AVG SUHU</p>
+                        <p className="text-lg font-bold text-orange-400">{getAverage(item.gate, 'suhu')}°C</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-gray-400 text-[10px]">AVG LEMBAP</p>
+                        <p className="text-lg font-bold text-cyan-600">{getAverage(item.gate, 'kelembapan')}%</p>
+                      </div>
+                    </div>
+                  </div>
 
-          <div className="bg-white border border-red-100 rounded-3xl overflow-hidden shadow-lg mt-10">
-            <div className="bg-red-50 p-4 border-b border-red-100 text-center">
-              <h3 className="text-red-600 font-bold uppercase tracking-widest">
-                ⚠️ Log Riwayat Suhu Ekstrem (&gt;27°C)
-              </h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="space-y-4">
+                      <div className="bg-white p-5 rounded-2xl border border-gray-200 flex justify-between items-center shadow-sm">
+                        <span className="text-gray-400 text-xs">SUHU SAAT INI</span>
+                        <span className={`text-3xl font-black ${item.suhu > 27 ? 'text-red-500' : 'text-gray-900'}`}>
+                          {item.suhu}°C
+                        </span>
+                      </div>
+                      <div className="bg-white p-5 rounded-2xl border border-gray-200 flex justify-between items-center shadow-sm">
+                        <span className="text-gray-400 text-xs">LEMBAP SAAT INI</span>
+                        <span className="text-3xl font-black text-blue-500">{item.kelembapan}%</span>
+                      </div>
+                    </div>
+
+                    <div className="lg:col-span-2 bg-white p-4 rounded-2xl border border-gray-200 h-[280px] shadow-sm">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={history[item.gate] || []}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#eee" vertical={false} />
+                          <XAxis dataKey="waktuDisplay" stroke="#999" fontSize={10} />
+                          <YAxis stroke="#999" fontSize={10} domain={['auto', 'auto']} />
+                          <Tooltip contentStyle={{backgroundColor:'#fff', border:'1px solid #ddd', borderRadius: '8px'}} />
+                          <Legend />
+                          <Line name="Suhu (°C)" type="monotone" dataKey="suhu" stroke="#f97316" strokeWidth={3} dot={false} isAnimationActive={false} />
+                          <Line name="Lembap (%)" type="monotone" dataKey="kelembapan" stroke="#06b6d4" strokeWidth={3} dot={false} isAnimationActive={false} />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="p-4 overflow-y-auto" style={{ height: '300px' }}>
-              <table className="w-full text-left border-separate border-spacing-0">
-                <thead className="sticky top-0 bg-white z-20">
-                  <tr className="text-gray-400 text-[10px] uppercase border-b border-gray-100">
-                    <th className="py-3 px-4 bg-white">Waktu</th>
-                    <th className="py-3 px-4 bg-white">Gerbang Tol</th>
-                    <th className="py-3 px-4 text-center bg-white">Suhu</th>
-                    <th className="py-3 px-4 text-center font-bold bg-white">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {data.filter(d => d.suhu > 27).length > 0 ? (
-                    [...data].filter(d => d.suhu > 27).reverse().map((d, i) => (
-                      <tr key={i} className="text-sm hover:bg-red-50 transition-colors">
-                        <td className="py-4 px-4 text-gray-500 whitespace-nowrap">{d.waktuDisplay}</td>
-                        <td className="py-4 px-4 font-medium text-gray-900">{d.gate}</td>
-                        <td className="py-4 px-4 text-center text-red-600 font-bold">{d.suhu}°C</td>
-                        <td className="py-4 px-4 text-center">
-                          <span className="bg-red-500 text-white text-[10px] px-3 py-1 rounded-full font-bold animate-pulse">DANGER</span>
+
+            <div className="bg-white border border-red-100 rounded-3xl overflow-hidden shadow-lg mb-20">
+              <div className="bg-red-50 p-4 border-b border-red-100 text-center">
+                <h3 className="text-red-600 font-bold uppercase tracking-widest">
+                  ⚠️ Log Riwayat Suhu Ekstrem (&gt;27°C)
+                </h3>
+              </div>
+              <div className="p-4 overflow-y-auto" style={{ height: '300px' }}>
+                <table className="w-full text-left border-separate border-spacing-0">
+                  <thead className="sticky top-0 bg-white z-20">
+                    <tr className="text-gray-400 text-[10px] uppercase border-b border-gray-100">
+                      <th className="py-3 px-4 bg-white">Waktu</th>
+                      <th className="py-3 px-4 bg-white">Gerbang Tol</th>
+                      <th className="py-3 px-4 text-center bg-white">Suhu</th>
+                      <th className="py-3 px-4 text-center font-bold bg-white">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {data.filter(d => d.suhu > 27).length > 0 ? (
+                      [...data].filter(d => d.suhu > 27).reverse().map((d, i) => (
+                        <tr key={i} className="text-sm hover:bg-red-50 transition-colors">
+                          <td className="py-4 px-4 text-gray-500 whitespace-nowrap">{d.waktuDisplay}</td>
+                          <td className="py-4 px-4 font-medium text-gray-900">{d.gate}</td>
+                          <td className="py-4 px-4 text-center text-red-600 font-bold">{d.suhu}°C</td>
+                          <td className="py-4 px-4 text-center">
+                            <span className="bg-red-500 text-white text-[10px] px-3 py-1 rounded-full font-bold animate-pulse">DANGER</span>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={4} className="py-20 text-center text-gray-400 italic">
+                          Belum ada data suhu ekstrem dari sensor.
                         </td>
                       </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={4} className="py-20 text-center text-gray-400 italic">
-                        Belum ada data suhu ekstrem dari sensor.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </div>
     </main>
   );
 }
