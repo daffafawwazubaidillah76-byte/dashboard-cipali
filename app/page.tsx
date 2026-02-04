@@ -9,13 +9,24 @@ export default function DashboardCipali() {
   const [history, setHistory] = useState<{ [key: string]: any[] }>({});
   const [loading, setLoading] = useState(true);
 
+  // 1. DEFINISIKAN URUTAN GERBANG TOL
+  const urutanGerbang = [
+    "GT_CIKOPO", 
+    "GT_KALIJATI", 
+    "GT_SUBANG", 
+    "GT_CIKEDUNG", 
+    "GT_KERTAJATI", 
+    "GT_SUMBERJAYA", 
+    "GT_PALIMANAN"
+  ];
+
   const fetchSensorData = useCallback(async () => {
     try {
       const response = await fetch('/api/suhu'); 
       const jsonData = await response.json();
       
       if (Array.isArray(jsonData) && jsonData.length > 0) {
-        const formattedData = jsonData.map((item: any) => ({
+        let formattedData = jsonData.map((item: any) => ({
           ...item,
           gate: item.lokasi, 
           waktuDisplay: new Date(item.waktu).toLocaleTimeString('id-ID'),
@@ -23,6 +34,11 @@ export default function DashboardCipali() {
             day: 'numeric', month: 'long', year: 'numeric' 
           })
         }));
+
+        // 2. PROSES PENGURUTAN (SORTING)
+        formattedData.sort((a, b) => {
+          return urutanGerbang.indexOf(a.gate) - urutanGerbang.indexOf(b.gate);
+        });
 
         setData(formattedData);
 
@@ -58,7 +74,6 @@ export default function DashboardCipali() {
   };
 
   return (
-    // Mengubah bg-black menjadi bg-white dan text-white menjadi text-gray-900
     <main className="min-h-screen bg-white text-gray-900 p-4 md:p-8 font-sans">
       <h1 className="text-3xl font-bold text-center text-orange-500 mb-12 uppercase tracking-widest">
         Monitoring Ruang Server Cipali
@@ -67,17 +82,15 @@ export default function DashboardCipali() {
       {loading ? (
         <div className="flex flex-col items-center justify-center py-40">
           <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-gray-500">Sinkronisasi Data InfluxDB Cloud...</p>
+          <p className="text-gray-500">Menyusun Data Gerbang Tol...</p>
         </div>
       ) : (
         <>
           <div className="space-y-12 mb-16">
             {data.map((item, i) => (
-              // Mengubah bg-[#0a0a0a] menjadi bg-gray-50 dan border-gray-800 menjadi border-gray-200
               <div key={i} className="bg-gray-50 border border-gray-200 p-6 rounded-3xl shadow-sm">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b border-gray-200 pb-4">
                   <div>
-                    {/* Mengubah text-blue-400 menjadi text-orange-600 */}
                     <h2 className="text-2xl font-black text-orange-600">{item.gate}</h2>
                     <p className="text-gray-500 text-[10px] mt-1 uppercase tracking-wider">
                         📅 {item.tanggalDisplay} | 🕒 {item.waktuDisplay}
@@ -97,17 +110,14 @@ export default function DashboardCipali() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                   <div className="space-y-4">
-                    {/* Mengubah bg-[#111] menjadi bg-white */}
                     <div className="bg-white p-5 rounded-2xl border border-gray-200 flex justify-between items-center shadow-sm">
                       <span className="text-gray-400 text-xs">SUHU SAAT INI</span>
-                      {/* Warna tetap mengikuti logika sensor (merah jika > 27, jika tidak hitam) */}
                       <span className={`text-3xl font-black ${item.suhu > 27 ? 'text-red-500' : 'text-gray-900'}`}>
                         {item.suhu}°C
                       </span>
                     </div>
                     <div className="bg-white p-5 rounded-2xl border border-gray-200 flex justify-between items-center shadow-sm">
                       <span className="text-gray-400 text-xs">LEMBAP SAAT INI</span>
-                      {/* Warna pembacaan sensor tetap (biru/cyan) sesuai permintaan Anda */}
                       <span className="text-3xl font-black text-blue-500">{item.kelembapan}%</span>
                     </div>
                   </div>
@@ -118,7 +128,6 @@ export default function DashboardCipali() {
                         <CartesianGrid strokeDasharray="3 3" stroke="#eee" vertical={false} />
                         <XAxis dataKey="waktuDisplay" stroke="#999" fontSize={10} />
                         <YAxis stroke="#999" fontSize={10} domain={['auto', 'auto']} />
-                        {/* Tooltip disesuaikan untuk tema terang */}
                         <Tooltip contentStyle={{backgroundColor:'#fff', border:'1px solid #ddd', borderRadius: '8px'}} />
                         <Legend />
                         <Line name="Suhu (°C)" type="monotone" dataKey="suhu" stroke="#f97316" strokeWidth={3} dot={false} isAnimationActive={false} />
