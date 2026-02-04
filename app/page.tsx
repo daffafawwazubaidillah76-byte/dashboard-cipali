@@ -59,8 +59,8 @@ export default function DashboardCipali() {
 
   return (
     <main className="min-h-screen bg-black text-white p-4 md:p-8 font-sans">
-      <h1 className="text-3xl font-bold text-center text-orange-500 mb-12 uppercase tracking-widest">
-          Monitoring Ruang Server Cipali
+      <h1 className="text-3xl font-bold text-center text-orange-500 drop-shadow-[0_0_10px_rgba(249,115,22,0.5)] mb-12 uppercase tracking-widest">
+           Monitoring Ruang Server Cipali
       </h1>
 
       {loading ? (
