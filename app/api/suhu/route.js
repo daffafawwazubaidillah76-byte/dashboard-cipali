@@ -10,7 +10,7 @@ export async function GET() {
   const client = new InfluxDB({ url, token });
   const queryApi = client.getQueryApi(org);
 
-  // Mengambil data 1 jam terakhir dan mengelompokkan berdasarkan field
+  // Query untuk mengambil data terbaru dari InfluxDB
   const fluxQuery = `from(bucket: "${bucket}") 
     |> range(start: -1h) 
     |> filter(fn: (r) => r["_measurement"] == "suhu_tol_cipali")
@@ -20,9 +20,10 @@ export async function GET() {
   try {
     const rows = await queryApi.collectRows(fluxQuery);
     const data = rows.map((row) => ({
-      lokasi: row.gerbang_tol,
-      suhu: row.temp,      // Diambil dari field 'temp' di ESP32
-      kelembapan: row.hum, // Diambil dari field 'hum' di ESP32
+      // Map 'gerbang_tol' menjadi 'lokasi' agar sesuai dengan fetch di frontend
+      lokasi: row.gerbang_tol || "Tidak Diketahui",
+      suhu: Number(row.temp) || 0,     // Konversi ke Number agar grafik bisa merender garis
+      kelembapan: Number(row.hum) || 0, // Sesuai field 'hum' di InfluxDB
       waktu: row._time,
     }));
     return NextResponse.json(data);
